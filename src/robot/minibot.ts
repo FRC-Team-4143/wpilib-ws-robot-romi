@@ -7,7 +7,7 @@ import LogUtil from "../utils/logging/log-util";
 
 const logger = LogUtil.getLogger("minibot");
 
-export default class WPILibWSRomiRobot extends WPILibWSRobotBase {
+export default class WPILibWSminibot extends WPILibWSRobotBase {
     private _queuedBus: QueuedI2CBus;
     private _i2cHandle: QueuedI2CHandle;
 
@@ -60,7 +60,7 @@ export default class WPILibWSRomiRobot extends WPILibWSRobotBase {
                 // Set up the heartbeat. Only send the heartbeat if we have
                 // an active WS connection, the robot is in enabled state
                 // AND we have a recent-ish DS packet
-                this._heartbeatTimer = setInterval(() => {this._setRomiHeartBeat();}, 100 );
+                //this._heartbeatTimer = setInterval(() => {this._setRomiHeartBeat();}, 100 );
 
             })
             .catch(err => {
@@ -95,6 +95,7 @@ export default class WPILibWSRomiRobot extends WPILibWSRobotBase {
 	    const tmp = Buffer.alloc(2);
 	    tmp.writeInt16BE(Value);
 
+            const offset = 0;
 	    this._i2cHandle.writeWord(offset, tmp.readUInt16BE())
 	    .catch(err => {
 		this._i2cErrorDetector.addErrorInstance();
@@ -135,7 +136,43 @@ export default class WPILibWSRomiRobot extends WPILibWSRobotBase {
         logger.info("Robot ENABLED");
         this._dsEnabled = true;
         // To ensure Romi will act on signals sent immediately
-        this._setRomiHeartBeat();
+        //this._setRomiHeartBeat();
+    }
+
+    public getAnalogInVoltage(channel: number): number {
+        return 0.0;
+    }
+
+    public setAnalogOutVoltage(channel: number, voltage: number): void {
+        return;
+    }
+
+    public setDigitalChannelMode(channel: number, mode: DigitalChannelMode): void {
+        return;
+    }
+
+    public setEncoderReverseDirection(channel: number, reverse: boolean): void {
+        return;
+    }
+
+    public getEncoderPeriod(channel: number): number {
+        return 0;
+    }
+
+    public getEncoderCount(channel: number): number {
+        return 0;
+    }
+
+    public getDIOValue(channel: number): boolean {
+        return false;
+    }
+
+    public setDIOValue(channel: number, value: boolean): void {
+        return;
+    }
+
+    public resetEncoder(channel: number, keepLast?: boolean): void {
+        return;
     }
 
     public onRobotDisabled(): void {
