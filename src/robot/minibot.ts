@@ -41,7 +41,7 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
 
     private _statusNetworkTable: NetworkTable;
     private _configNetworkTable: NetworkTable;
-    private _pwm: PCA9685Driver;
+    private _pwm: Pca9685Driver;
 
     // Take in the abstract bus, since this will allow us to
     // write unit tests more easily
@@ -60,7 +60,7 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
         // Configure the onboard hardware
 	//
 	// setup PCA chip here
-	_pwm = new Pca9685Driver(options, function startLoop(err: any): void {
+	this._pwm = new Pca9685Driver(options, function startLoop(err: any): void {
 	    if (err) {
        		 console.error("Error initializing PCA9685");
        		 process.exit(-1);
@@ -105,7 +105,7 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
 	    // We get the value in the range 0-255 
 	    const Value = Math.floor(((value / 255) * 1000) + 1000);
 
-	    pwm.setPulseLength(channel, Value);
+	    this._pwm.setPulseLength(channel, Value);
 
 	    // We need to do some trickery to get a twos-complement number
 	    // Essentially we'll write a 16 bit signed int to the buffer
