@@ -3,13 +3,13 @@ import fs from "fs";
 import path from "path";
 import WPILibWSminibot from "./robot/minibot";
 import { WPILibWSRobotEndpoint, WPILibWSServerConfig, WPILibWSClientConfig } from "@wpilib/wpilib-ws-robot";
-import I2CPromisifiedBus from "./device-interfaces/i2c/i2c-connection";
+//import I2CPromisifiedBus from "./device-interfaces/i2c/i2c-connection";
 import program from "commander";
 import ServiceConfiguration, { EndpointType } from "./service-config";
 import ProgramArguments from "./program-arguments";
 import RestInterface from "./services/rest-interface/rest-interface";
 import DSServer from "./services/ds-interface/ds-ip-server";
-import QueuedI2CBus from "./device-interfaces/i2c/queued-i2c-bus";
+//import QueuedI2CBus from "./device-interfaces/i2c/queued-i2c-bus";
 import { NetworkTableInstance } from "node-ntcore";
 import { execSync } from "child_process";
 import LogUtil, { LogLevel } from "./utils/logging/log-util";
@@ -18,7 +18,7 @@ import LogUtil, { LogLevel } from "./utils/logging/log-util";
 const mainLogger = LogUtil.getLogger("MAIN");
 const configLogger = LogUtil.getLogger("CONFIG");
 const restLogger = LogUtil.getLogger("SVC-REST");
-const i2cLogger = LogUtil.getLogger("I2C");
+//const i2cLogger = LogUtil.getLogger("I2C");
 
 let packageVersion: string = "0.0.0";
 
@@ -62,17 +62,17 @@ catch (err) {
     process.exit();
 }
 
-const I2C_BUS_NUM: number = 1;
+//const I2C_BUS_NUM: number = 1;
 
 // Set up the i2c bus out here
-let i2cBus: I2CPromisifiedBus;
+//let i2cBus: I2CPromisifiedBus;
 let endpoint: WPILibWSRobotEndpoint;
 
-const HardwareI2C = require("./device-interfaces/i2c/hw-i2c").default;
-i2cBus = new HardwareI2C(I2C_BUS_NUM);
+//const HardwareI2C = require("./device-interfaces/i2c/hw-i2c").default;
+//i2cBus = new HardwareI2C(I2C_BUS_NUM);
 
 // Set up the queued bus
-const queuedI2CBus: QueuedI2CBus =  new QueuedI2CBus(i2cBus);
+//const queuedI2CBus: QueuedI2CBus =  new QueuedI2CBus(i2cBus);
 
 // Set up network tables
 let ntConnected = false;
@@ -104,7 +104,8 @@ catch (err) {}
 miniInfoTable.getEntry("Identifier").setString(piIdent);
 miniInfoTable.getEntry("Service Version").setString(packageVersion);
 
-const robot: WPILibWSminibot = new WPILibWSminibot(queuedI2CBus, 0x14);
+const robot: WPILibWSminibot = new WPILibWSminibot();
+//const robot: WPILibWSminibot = new WPILibWSminibot(queuedI2CBus, 0x40);
 
 if (serviceConfig.endpointType === EndpointType.SERVER) {
     const serverSettings: WPILibWSServerConfig = {

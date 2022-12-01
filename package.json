@@ -1,6 +1,6 @@
 {
   "name": "@wpilib/wpilib-ws-robot-romi",
-  "version": "1.4.0",
+  "version": "1.4.4143",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -35,10 +35,11 @@
     "jsonfile": "^6.0.1",
     "node-ntcore": "^0.1.5",
     "promise-queue": "^2.2.5",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "pca9685": "^5.0.0",
+    "i2c-bus": "^5.2.0"
   },
   "optionalDependencies": {
-    "i2c-bus": "^5.2.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.8",

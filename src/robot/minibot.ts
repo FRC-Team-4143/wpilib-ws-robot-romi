@@ -1,15 +1,26 @@
 import { WPILibWSRobotBase, DigitalChannelMode } from "@wpilib/wpilib-ws-robot";
 
-import I2CErrorDetector from "../device-interfaces/i2c/i2c-error-detector";
-import QueuedI2CBus, { QueuedI2CHandle } from "../device-interfaces/i2c/queued-i2c-bus";
+//import I2CErrorDetector from "../device-interfaces/i2c/i2c-error-detector";
+//import QueuedI2CBus, { QueuedI2CHandle } from "../device-interfaces/i2c/queued-i2c-bus";
 import { NetworkTableInstance, NetworkTable, EntryListenerFlags } from "node-ntcore";
 import LogUtil from "../utils/logging/log-util";
 
 const logger = LogUtil.getLogger("minibot");
+import * as i2cBus from "i2c-bus";
+import Pca9685Driver from "pca9685";
+
+// PCA9685 options
+const options =
+{
+    i2c: i2cBus.openSync(1),
+    address: 0x40, // default value
+    frequency: 50, // default value
+    debug: true
+};
 
 export default class WPILibWSminibot extends WPILibWSRobotBase {
-    private _queuedBus: QueuedI2CBus;
-    private _i2cHandle: QueuedI2CHandle;
+   //private _queuedBus: QueuedI2CBus;
+   //private _i2cHandle: QueuedI2CHandle;
 
     private _batteryPct: number = 0;
 
@@ -17,7 +28,7 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
     private _readTimer: NodeJS.Timeout;
 
     private _readyP: Promise<void>;
-    private _i2cErrorDetector: I2CErrorDetector = new I2CErrorDetector(10, 500, 100);
+    //private _i2cErrorDetector: I2CErrorDetector = new I2CErrorDetector(10, 500, 100);
 
     // Keep track of the number of active WS connections
     private _numWsConnections: number = 0;
@@ -30,10 +41,12 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
 
     private _statusNetworkTable: NetworkTable;
     private _configNetworkTable: NetworkTable;
+    private _pwm: PCA9685Driver;
 
     // Take in the abstract bus, since this will allow us to
     // write unit tests more easily
-    constructor(bus: QueuedI2CBus, address: number) {
+    //constructor(bus: QueuedI2CBus, address: number) {
+    constructor() {
         super();
 
         const ntInstance = NetworkTableInstance.getDefault();
@@ -41,12 +54,19 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
         this._configNetworkTable = ntInstance.getTable("/minibot/Config");
 
         // By default, we'll use a queued I2C bus
-        this._queuedBus = bus;
-        this._i2cHandle = this._queuedBus.getNewAddressedHandle(address, true);
+	//this._queuedBus = bus;
+	//this._i2cHandle = this._queuedBus.getNewAddressedHandle(address, true);
 
         // Configure the onboard hardware
 	//
 	// setup PCA chip here
+	_pwm = new Pca9685Driver(options, function startLoop(err: any): void {
+	    if (err) {
+       		 console.error("Error initializing PCA9685");
+       		 process.exit(-1);
+	    }
+	});
+
 
         // Set up NT interfaces
         this._configureNTInterface();
@@ -82,24 +102,30 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
         }
 
 
-	    // We get the value in the range 0-255 but the romi
-	    // expects -400 to 400
-	    // Positive values here correspond to forward motion
-	    const Value = Math.floor(((value / 255) * 800) - 400);
+	    // We get the value in the range 0-255 
+	    const Value = Math.floor(((value / 255) * 1000) + 1000);
+
+	    pwm.setPulseLength(channel, Value);
 
 	    // We need to do some trickery to get a twos-complement number
 	    // Essentially we'll write a 16 bit signed int to the buffer
 	    // and read it out as an unsigned int
 	    // Mainly to work around the fact that the i2c-bus library's
 	    // writeBlock() doesn't work...
-	    const tmp = Buffer.alloc(2);
-	    tmp.writeInt16BE(Value);
 
-            const offset = 0;
-	    this._i2cHandle.writeWord(offset, tmp.readUInt16BE())
-	    .catch(err => {
-		this._i2cErrorDetector.addErrorInstance();
-	    });
+	    //const on_offset = 40 + 6 + (channel * 4);
+	    //this._i2cHandle.writeWord(on_offset, 0)
+	    //.catch(err => {
+	    //		this._i2cErrorDetector.addErrorInstance();
+	    //});
+
+	    //const tmp = Buffer.alloc(2);
+	    //tmp.writeInt16BE(Value);
+	    //const off_offset = 40 + 8 + (channel * 4);
+	    //this._i2cHandle.writeWord(off_offset, tmp.readUInt16BE())
+	    //.catch(err => {
+	    //	this._i2cErrorDetector.addErrorInstance();
+	    //});
     }
 
     /**
