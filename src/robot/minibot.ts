@@ -103,7 +103,7 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
 
 
 	    // We get the value in the range 0-255 
-	    const Value = Math.floor(((value / 255) * 1000) + 1000);
+	    const Value = Math.floor(((value / 255) * 1000) + 1500);
 
 	    this._pwm.setPulseLength(channel, Value);
 
@@ -204,11 +204,13 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
     public onRobotDisabled(): void {
         logger.info("Robot DISABLED");
         this._dsEnabled = false;
+        this._pwm.allChannelsOff();
     }
 
     public onDSPacketTimeoutOccurred(): void {
         logger.warn("DS Packet Heartbeat Lost");
         this._dsHeartbeatPresent = false;
+        this._pwm.allChannelsOff();
     }
 
     public onDSPacketTimeoutCleared(): void {
@@ -228,6 +230,7 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
      * This does NOT reset any IO configuration
      */
     private _resetToCleanState(): void {
+        this._pwm.allChannelsOff();
 
         // Reset our ds enabled state
         this._dsEnabled = false;
