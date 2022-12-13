@@ -101,6 +101,10 @@ export default class WPILibWSminibot extends WPILibWSRobotBase {
             return;
         }
 
+	if (this._dsEnabled == false) {
+	    return;
+	}
+
 
 	    // We get the value in the range 0-255 
 	    const Value = Math.floor(((value / 255) * 1000) + 1500);
